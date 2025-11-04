@@ -73,7 +73,6 @@
       </mat-select>
     </mat-form-field>
 
-    <!-- Adresse -->
     <div class="section col-2">
       <h2><mat-icon>home</mat-icon> Adresse</h2>
       <mat-divider></mat-divider>
@@ -88,25 +87,52 @@
 
     <mat-form-field appearance="outline">
       <mat-label>Code postal</mat-label>
-      <input matInput formControlName="zip">
+      <input matInput formControlName="zip" inputmode="numeric" autocomplete="postal-code">
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="col-2">
       <mat-label>Localité</mat-label>
-      <input matInput formControlName="city">
+      <input
+        matInput
+        formControlName="city"
+        [matAutocomplete]="autoCity"
+        [matAutocompleteDisabled]="!isCH"
+        autocomplete="address-level2">
     </mat-form-field>
 
+    <mat-autocomplete #autoCity="matAutocomplete" (optionSelected)="onCitySelected($event.option.value)">
+      <mat-option *ngFor="let o of (cityOptions$ | async)" [value]="o">
+        {{ o.zip }} {{ o.city }} <ng-container *ngIf="o.canton">({{ o.canton }})</ng-container>
+      </mat-option>
+    </mat-autocomplete>
     <mat-form-field appearance="outline" class="col-2">
       <mat-label>Rue</mat-label>
-      <input matInput formControlName="street">
+      <input
+        matInput
+        formControlName="street"
+        [matAutocomplete]="autoAddr"
+        [matAutocompleteDisabled]="!isCH"
+        autocomplete="address-line1">
     </mat-form-field>
+
+    <mat-autocomplete #autoAddr="matAutocomplete">
+      <mat-option
+        *ngFor="let a of (addressOptions$ | async)"
+        [value]="a.street"
+        (onSelectionChange)="a && $event.isUserInput && onAddressSelected(a)">
+        {{ a.street }}
+      </mat-option>
+    </mat-autocomplete>
 
     <mat-form-field appearance="outline">
-      <mat-label>État</mat-label>
-      <input matInput formControlName="state">
+      <mat-label>{{ isCH ? 'Canton' : 'État / Région' }}</mat-label>
+      <input
+        matInput
+        formControlName="state"
+        [readonly]="isCH"
+        [placeholder]="isCH ? 'Défini via la localité' : ''">
     </mat-form-field>
-
-    <!-- Ménage & revenus -->
+     <!-- Ménage & revenus -->
     <div class="section col-2">
       <h2><mat-icon>account_balance_wallet</mat-icon> Ménage et revenu</h2>
       <mat-divider></mat-divider>

@@ -12,6 +12,9 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService, BikeBuyerPayload } from '../services/api.service';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { GeoAdminService } from '../services/geoadmin.service';
+import { Observable, of, debounceTime, distinctUntilChanged, filter, map, startWith, switchMap } from 'rxjs';
 
 type Country = 'CH' | 'DE' | 'GB';
 type LangCode = 'EN'|'FR'|'DE'|'IT';
@@ -40,7 +43,7 @@ const OCCUPATION_OPTIONS = [
     MatFormFieldModule, MatInputModule, MatSelectModule,
     MatCheckboxModule, MatButtonModule,
     MatDatepickerModule, MatNativeDateModule, MatDividerModule,
-    MatIconModule, MatProgressSpinnerModule
+    MatIconModule, MatProgressSpinnerModule, MatAutocompleteModule
   ],
   templateUrl: './registration-form.component.html',
   styleUrls: ['./registration-form.component.scss'],
@@ -48,6 +51,7 @@ const OCCUPATION_OPTIONS = [
 export class RegistrationFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private api = inject(ApiService);
+  private geo = inject(GeoAdminService);
 
   result: { ok: boolean; percentile?: number; probTrue?: number; probFalse?: number  } | null = null;
   loading = false;
@@ -61,6 +65,9 @@ export class RegistrationFormComponent implements OnInit {
 
   educationOptions = [...EDUCATION_OPTIONS];
   occupationOptions = [...OCCUPATION_OPTIONS];
+
+  cityOptions$: Observable<Array<{ zip: string; city: string; canton?: string }>> = of([]);
+  addressOptions$: Observable<Array<{ street: string; canton?: string; zip?: string; city?: string }>> = of([]);
 
   form = this.fb.group({
     language: ['FR' as LangCode],
@@ -87,11 +94,67 @@ export class RegistrationFormComponent implements OnInit {
     occupation: [OCCUPATION_OPTIONS[0].value],
   });
 
+  get isCH(): boolean {
+    return this.form.controls.country.value === 'CH';
+  }
+
   ngOnInit(): void {
     this.form.controls.birthDate.valueChanges.subscribe(d => {
       this.age = d ? this.computeAge(d) : null;
     });
+
+    // Autocomplete
+    const country$ = this.form.controls.country.valueChanges.pipe(startWith(this.form.controls.country.value));
+    this.cityOptions$ = this.form.controls.zip.valueChanges.pipe(
+      startWith(this.form.controls.zip.value),
+      debounceTime(200),
+      map(v => (v ?? '').toString().trim()),
+      filter(v => v.length >= 3),
+      distinctUntilChanged(),
+      switchMap(zip => country$.pipe(
+        map(c => ({ zip, c }))
+      )),
+      filter(({ c }) => c === 'CH'),
+      switchMap(({ zip }) => this.geo.searchZipLocalities(zip))
+    );
+
+    this.addressOptions$ = this.form.controls.street.valueChanges.pipe(
+      startWith(this.form.controls.street.value),
+      debounceTime(250),
+      map(v => (v ?? '').toString().trim()),
+      filter(v => v.length >= 2),
+      distinctUntilChanged(),
+      switchMap(streetLike => country$.pipe(map(c => ({ streetLike, c })))),
+      filter(({ c }) => c === 'CH'),
+      switchMap(({ streetLike }) =>
+        this.geo.searchAddresses(streetLike, this.form.controls.city.value ?? '')
+      )
+    );
+
+    this.form.controls.country.valueChanges.subscribe(c => {
+      if (c !== 'CH') {
+        this.cityOptions$ = of([]);
+        this.addressOptions$ = of([]);
+      }
+    });
   }
+
+  onCitySelected(opt: { zip: string; city: string; canton?: string }) {
+    this.form.patchValue({
+      zip: opt.zip,
+      city: opt.city,
+      state: opt.canton ?? this.form.controls.state.value
+    });
+  }
+
+  onAddressSelected(sel: { street: string; canton?: string; zip?: string; city?: string }) {
+    this.form.patchValue({
+      street: sel.street,
+      state: sel.canton ?? this.form.controls.state.value,
+    });
+  }
+
+
 
   private computeAge(d: Date): number {
     const today = new Date();
@@ -99,7 +162,7 @@ export class RegistrationFormComponent implements OnInit {
     const m = today.getMonth() - d.getMonth();
     if (m < 0 || (m === 0 && today.getDate() < d.getDate())) age--;
     return age;
-    }
+  }
 
   submit() {
     this.result = null;
