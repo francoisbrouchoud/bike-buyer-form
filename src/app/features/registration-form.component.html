@@ -1,0 +1,164 @@
+<div class="card">
+  <h1>Données du client</h1>
+  <p class="subtitle">Veuillez remplir les données ci-dessous pour prédire l’achat de vélo.</p>
+
+  <!-- Profil -->
+  <h2><mat-icon>person</mat-icon> Profil</h2>
+  <mat-divider></mat-divider>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="grid">
+    <mat-form-field appearance="outline">
+      <mat-label>Langue</mat-label>
+      <mat-select formControlName="language">
+        <mat-option *ngFor="let l of languageOptions" [value]="l">{{ l }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Genre</mat-label>
+      <mat-select formControlName="gender">
+        <mat-option *ngFor="let g of genders" [value]="g.value">{{ g.key }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Prénom</mat-label>
+      <input matInput formControlName="firstName">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Nom</mat-label>
+      <input matInput formControlName="lastName">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Date de naissance</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="birthDate">
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-hint *ngIf="age !== null">Âge : {{ age }}</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Taille (cm)</mat-label>
+      <input matInput type="number" formControlName="height">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Statut marital</mat-label>
+      <mat-select formControlName="maritalStatus">
+        <mat-option *ngFor="let m of maritals" [value]="m.value">{{ m.key }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Contact -->
+    <div class="section col-2">
+      <h2><mat-icon>mail</mat-icon> Contact</h2>
+      <mat-divider></mat-divider>
+    </div>
+
+    <mat-form-field appearance="outline" class="col-2">
+      <mat-label>Adresse e-mail</mat-label>
+      <input matInput formControlName="emailAddress">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Téléphone</mat-label>
+      <input matInput formControlName="phoneNumber">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Promotions par e-mail</mat-label>
+      <mat-select formControlName="emailPromotion">
+        <mat-option *ngFor="let yn of yesNo" [value]="yn.value">{{ yn.key }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Adresse -->
+    <div class="section col-2">
+      <h2><mat-icon>home</mat-icon> Adresse</h2>
+      <mat-divider></mat-divider>
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Pays</mat-label>
+      <mat-select formControlName="country">
+        <mat-option *ngFor="let c of countries" [value]="c.value">{{ c.key }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Code postal</mat-label>
+      <input matInput formControlName="zip">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="col-2">
+      <mat-label>Localité</mat-label>
+      <input matInput formControlName="city">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="col-2">
+      <mat-label>Rue</mat-label>
+      <input matInput formControlName="street">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>État</mat-label>
+      <input matInput formControlName="state">
+    </mat-form-field>
+
+    <!-- Ménage & revenus -->
+    <div class="section col-2">
+      <h2><mat-icon>account_balance_wallet</mat-icon> Ménage et revenu</h2>
+      <mat-divider></mat-divider>
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Revenu annuel</mat-label>
+      <input matInput type="number" formControlName="yearlyIncome">
+    </mat-form-field>
+
+    <mat-checkbox formControlName="homeOwner">Propriétaire</mat-checkbox>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre de voitures</mat-label>
+      <input matInput type="number" formControlName="numberCarsOwned">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre total d’enfants</mat-label>
+      <input matInput type="number" formControlName="totalChildren">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Enfants à la maison</mat-label>
+      <input matInput type="number" formControlName="totalChildrenAtHome">
+    </mat-form-field>
+
+    <!-- Éducation / Profession -->
+    <div class="section col-2">
+      <h2><mat-icon>school</mat-icon> Éducation et profession</h2>
+      <mat-divider></mat-divider>
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Niveau d’éducation</mat-label>
+      <mat-select formControlName="education">
+        <mat-option *ngFor="let e of educationOptions" [value]="e.value">{{ e.value }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Profession</mat-label>
+      <mat-select formControlName="occupation">
+        <mat-option *ngFor="let o of occupationOptions" [value]="o.value">{{ o.value }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="actions col-2">
+      <button mat-flat-button color="primary" type="submit" [disabled]="loading">
+        <mat-icon>pedal_bike</mat-icon>
+        Prédire l’achat de vélo
+      </button>
+    </div>
+  </form>
+</div>

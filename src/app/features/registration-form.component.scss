@@ -1,0 +1,37 @@
+.card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.08);
+  max-width: 1040px;
+  width: 100%;
+}
+
+h1 { margin: 0 0 6px; font-weight: 700; }
+.subtitle { margin: 0 0 16px; color: #5f6368; }
+
+h2 {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 1.05rem; font-weight: 600; margin: 18px 0 8px;
+}
+.section { margin-top: 8px; }
+
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(2, minmax(0,1fr)); }
+.col-2 { grid-column: span 2; }
+
+.actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+
+.result { margin-top: 12px; display: grid; gap: 8px; }
+.loading { display: inline-flex; align-items: center; gap: 8px; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: 999px; background: #f3f4f6; color: #111827;
+}
+.chip.ok { background: #e6f4ea; color: #146C2E; }
+.chip.ko { background: #fde8e8; color: #B42318; }
+.score { opacity: .75; }
+
+@media (max-width: 800px) {
+  .grid { grid-template-columns: 1fr; }
+}
