@@ -161,4 +161,29 @@
       </button>
     </div>
   </form>
+
+  <div class="result" *ngIf="loading || result">
+  <div class="loading" *ngIf="loading">
+    <mat-progress-spinner mode="indeterminate" diameter="22"></mat-progress-spinner>
+    Prediction en cours...
+  </div>
+  <div *ngIf="!loading && result">
+    <span class="chip" [class.ok]="result.ok" [class.ko]="!result.ok">
+      <mat-icon>{{ result.ok ? 'check_circle' : 'cancel' }}</mat-icon>
+      {{ result.ok ? 'BikeBuyer: Yes' : 'BikeBuyer: No' }}
+    </span>
+
+    <div *ngIf="result.percentile != null">
+      <span class="chip">
+      <mat-icon>info</mat-icon> Pourcentage : {{ result.percentile }} % 
+      </span>
+    </div>
+
+    <div *ngIf="result.probTrue != null && result.probFalse != null">
+      <span class="chip">
+      <mat-icon>insights</mat-icon> 
+      p(true): {{ result.probTrue | number:'1.0-3' }} | p(false): {{ result.probFalse | number:'1.0-3' }}
+      </span>
+    </div>
+  </div>
 </div>

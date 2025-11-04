@@ -10,6 +10,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ApiService, BikeBuyerPayload } from '../services/api.service';
 
 type Country = 'CH' | 'DE' | 'GB';
 type LangCode = 'EN'|'FR'|'DE'|'IT';
@@ -38,14 +40,16 @@ const OCCUPATION_OPTIONS = [
     MatFormFieldModule, MatInputModule, MatSelectModule,
     MatCheckboxModule, MatButtonModule,
     MatDatepickerModule, MatNativeDateModule, MatDividerModule,
-    MatIconModule,
+    MatIconModule, MatProgressSpinnerModule
   ],
   templateUrl: './registration-form.component.html',
   styleUrls: ['./registration-form.component.scss'],
 })
 export class RegistrationFormComponent implements OnInit {
   private fb = inject(FormBuilder);
+  private api = inject(ApiService);
 
+  result: { ok: boolean; percentile?: number; probTrue?: number; probFalse?: number  } | null = null;
   loading = false;
   age: number | null = null;
 
@@ -95,12 +99,50 @@ export class RegistrationFormComponent implements OnInit {
     const m = today.getMonth() - d.getMonth();
     if (m < 0 || (m === 0 && today.getDate() < d.getDate())) age--;
     return age;
-  }
+    }
 
   submit() {
+    this.result = null;
     this.loading = true;
+
     const v = this.form.getRawValue();
-    console.log('Form submit (baseline):', v);
-    setTimeout(() => { this.loading = false; }, 400);
+    const payload: BikeBuyerPayload = {
+      features: {
+        Language: v.language,
+        FirstName: v.firstName,
+        LastName: v.lastName,
+        Country: v.country,
+        Zip: v.zip,
+        City: v.city,
+        Street: v.street,
+        State: v.state,
+        PhoneNumber: v.phoneNumber,
+        EmailAddress: v.emailAddress,
+        EmailPromotion: Number(v.emailPromotion) === 1 ? 1 : 0,
+        Gender: v.gender,
+        BirthDate: v.birthDate ? new Date(v.birthDate).toISOString().slice(0, 10) : null,
+        Age: this.age,
+        Height: v.height != null ? Number(v.height) : null,
+        MaritalStatus: v.maritalStatus,
+        YearlyIncome: v.yearlyIncome != null ? Number(v.yearlyIncome) : null,
+        TotalChildren: Number(v.totalChildren),
+        TotalChildrenAtHome: Number(v.totalChildrenAtHome),
+        Education: v.education,
+        Occupation: v.occupation,
+        HomeOwner: !!v.homeOwner,
+        NumberCarsOwned: Number(v.numberCarsOwned),
+      }
+    };
+
+    this.api.predict(payload).subscribe({
+      next: r => {
+        this.loading = false;
+        this.result = { ok: r.isBikeBuyer, percentile: r.percentile, probTrue: r.probTrue, probFalse: r.probFalse };
+      },
+      error: () => {
+        this.loading = false;
+        this.result = { ok: false };
+      }
+    });
   }
 }
