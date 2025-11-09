@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -14,6 +14,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService, BikeBuyerPayload } from '../services/api.service';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { GeoAdminService } from '../services/geoadmin.service';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { Observable, of, debounceTime, distinctUntilChanged, filter, map, startWith, switchMap } from 'rxjs';
 
 type Country = 'CH' | 'DE' | 'GB';
@@ -47,6 +48,7 @@ const YEARLY_INCOME_OPTIONS = [
 @Component({
   selector: 'app-registration-form',
   standalone: true,
+  providers: [{ provide: MAT_DATE_LOCALE, useValue: 'fr-CH' }],
   imports: [
     CommonModule, ReactiveFormsModule,
     MatFormFieldModule, MatInputModule, MatSelectModule,
@@ -89,7 +91,7 @@ export class RegistrationFormComponent implements OnInit {
     lastName:  [''],
     gender:    [''],
     birthDate: [null as Date | null],
-    height:    [null as number | null],
+    height:    [null, [Validators.min(100), Validators.max(275)]],
     maritalStatus: [''],
     emailAddress: [''],
     phoneNumber: [''],
