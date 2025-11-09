@@ -35,6 +35,15 @@ const OCCUPATION_OPTIONS = [
   { value: 'Manual', key: 'manual' }
 ] as const;
 
+const YEARLY_INCOME_OPTIONS = [
+  { value: '0-40000',        key: '0 – 40’000',          mid: 20000, level:1 },
+  { value: '40001-70000',    key: '40’001 – 70’000',     mid: 55000, level:2 },
+  { value: '70001-90000',    key: '70’001 – 90’000',     mid: 80000, level:3 },
+  { value: '90001-120000',   key: '90’001 – 120’000',    mid: 105000, level:4 },
+  { value: 'greater than 120000', key: 'Plus de 120’000', mid: 120000, level:5 },
+] as const;
+
+
 @Component({
   selector: 'app-registration-form',
   standalone: true,
@@ -69,6 +78,7 @@ export class RegistrationFormComponent implements OnInit {
 
   educationOptions = [...EDUCATION_OPTIONS];
   occupationOptions = [...OCCUPATION_OPTIONS];
+  incomeOptions = [...YEARLY_INCOME_OPTIONS];
 
   cityOptions$: Observable<Array<{ zip: string; city: string; canton?: string }>> = of([]);
   addressOptions$: Observable<Array<{ street: string; canton?: string; zip?: string; city?: string }>> = of([]);
@@ -89,7 +99,7 @@ export class RegistrationFormComponent implements OnInit {
     city:    [''],
     street:  [''],
     state:   [''],
-    yearlyIncome: [null as number | null],
+    yearlyIncome: [YEARLY_INCOME_OPTIONS[0].value],
     homeOwner: [false],
     numberCarsOwned: [0],
     totalChildren: [0],
@@ -191,7 +201,7 @@ export class RegistrationFormComponent implements OnInit {
         Age: this.age,
         Height: v.height != null ? Number(v.height) : null,
         MaritalStatus: v.maritalStatus,
-        YearlyIncome: v.yearlyIncome != null ? Number(v.yearlyIncome) : null,
+        YearlyIncome: v.yearlyIncome,
         TotalChildren: Number(v.totalChildren),
         TotalChildrenAtHome: Number(v.totalChildrenAtHome),
         Education: v.education,
