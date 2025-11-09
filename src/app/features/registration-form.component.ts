@@ -61,7 +61,11 @@ export class RegistrationFormComponent implements OnInit {
   countries = [{value:'CH' as Country, key:'Suisse'},{value:'DE' as Country, key:'Allemagne'},{value:'GB' as Country, key:'Royaume-Uni'}];
   genders = [{value:'M', key:'Homme'},{value:'F', key:'Femme'}];
   maritals = [{value:'M', key:'Marié'},{value:'S', key:'Célibataire'}];
-  yesNo = [{value:1, key:'yes'},{value:0, key:'no'}];
+  emailPromoOptions = [
+    { value: 0, key: 'Non' },
+    { value: 1, key: 'Mensuelle' },
+    { value: 2, key: 'Hebdomadaire' }
+  ];
 
   educationOptions = [...EDUCATION_OPTIONS];
   occupationOptions = [...OCCUPATION_OPTIONS];
@@ -181,7 +185,7 @@ export class RegistrationFormComponent implements OnInit {
         State: v.state,
         PhoneNumber: v.phoneNumber,
         EmailAddress: v.emailAddress,
-        EmailPromotion: Number(v.emailPromotion) === 1 ? 1 : 0,
+        EmailPromotion: Number(v.emailPromotion),
         Gender: v.gender,
         BirthDate: v.birthDate ? new Date(v.birthDate).toISOString().slice(0, 10) : null,
         Age: this.age,
