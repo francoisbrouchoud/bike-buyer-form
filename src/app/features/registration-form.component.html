@@ -186,7 +186,7 @@
     <mat-form-field appearance="outline">
       <mat-label>Niveau d’éducation</mat-label>
       <mat-select formControlName="education">
-        <mat-option *ngFor="let e of educationOptions" [value]="e.value">{{ e.value }}</mat-option>
+        <mat-option *ngFor="let e of educationOptions" [value]="e.level">{{ e.value }}</mat-option>
       </mat-select>
     </mat-form-field>
 

@@ -21,19 +21,19 @@ type Country = 'CH' | 'DE' | 'GB';
 type LangCode = 'EN'|'FR'|'DE'|'IT';
 
 const EDUCATION_OPTIONS = [
-  { value: 'Partial High School', key: 'partialHighSchool' },
-  { value: 'High School', key: 'highSchool' },
-  { value: 'Partial College', key: 'partialCollege' },
-  { value: 'Bachelors', key: 'bachelors' },
-  { value: 'Graduate Degree', key: 'graduateDegree' }
+  { value: 'Partial High School', level: 1 },
+  { value: 'High School', level: 2 },
+  { value: 'Partial College', level: 3 },
+  { value: 'Bachelors', level : 4},
+  { value: 'Graduate Degree', level: 5 }
 ] as const;
 
 const OCCUPATION_OPTIONS = [
-  { value: 'Professional', key: 'professional' },
-  { value: 'Skilled Manual', key: 'skilledManual' },
-  { value: 'Management', key: 'management' },
-  { value: 'Clerical', key: 'clerical' },
-  { value: 'Manual', key: 'manual' }
+  { value: 'Professional'},
+  { value: 'Skilled Manual'},
+  { value: 'Management'},
+  { value: 'Clerical'},
+  { value: 'Manual'}
 ] as const;
 
 const YEARLY_INCOME_OPTIONS = [
@@ -106,9 +106,9 @@ export class RegistrationFormComponent implements OnInit {
     state:   [''],
     yearlyIncome: [YEARLY_INCOME_OPTIONS[0].value],
     homeOwner: [false],
-    numberCarsOwned: [0],
-    totalChildren: [0],
-    totalChildrenAtHome: [0],
+    numberCarsOwned: [0, [Validators.min(0)]],
+    totalChildren: [0, [Validators.min(0)]],
+    totalChildrenAtHome: [0, [Validators.min(0)]],
     education: [EDUCATION_OPTIONS[2].value],
     occupation: [OCCUPATION_OPTIONS[0].value],
   });
