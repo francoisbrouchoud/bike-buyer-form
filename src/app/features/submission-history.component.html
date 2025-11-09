@@ -1,0 +1,44 @@
+<div class="history">
+  <h2><mat-icon>history</mat-icon> Historique local</h2>
+  <mat-divider></mat-divider>
+
+  <div *ngIf="(history.rows$ | async)?.length === 0" class="empty">
+    Aucun enregistrement pour l’instant.
+  </div>
+
+  <div class="history-table" *ngIf="(history.rows$ | async) as rows">
+    <div class="head">
+      <div>Prénom</div>
+      <div>Nom</div>
+      <div>Email</div>
+      <div>BikeBuyer</div>
+      <div>Pourcentage</div>
+      <div></div>
+    </div>
+
+    <div class="row" *ngFor="let r of rows; let i = index">
+      <div>{{ r.firstName }}</div>
+      <div>{{ r.lastName }}</div>
+      <div class="email">{{ r.email }}</div>
+      <div>
+        <span class="chip" [class.ok]="r.isBuyer" [class.ko]="!r.isBuyer">
+          <mat-icon>{{ r.isBuyer ? 'check_circle' : 'cancel' }}</mat-icon>
+          {{ r.isBuyer ? 'Oui' : 'Non' }}
+        </span>
+      </div>
+      <div>{{ r.percentile != null ? (r.percentile + ' %') : '—' }}</div>
+      <div class="actions">
+        <button mat-icon-button aria-label="Supprimer" (click)="remove(i)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar" *ngIf="(history.rows$ | async)?.length">
+    <button mat-button (click)="clear()">
+      <mat-icon>delete_sweep</mat-icon>
+      Vider l’historique
+    </button>
+  </div>
+</div>

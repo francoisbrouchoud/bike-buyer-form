@@ -17,6 +17,8 @@ import { GeoAdminService } from '../services/geoadmin.service';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { Observable, of, debounceTime, distinctUntilChanged, filter, map, startWith, switchMap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { SubmissionHistoryComponent } from './submission-history.component';
+import { HistoryService } from '../services/history.service';
 
 type Country = 'CH' | 'DE' | 'GB';
 type LangCode = 'EN'|'FR'|'DE'|'IT';
@@ -84,7 +86,8 @@ const PHONE_REGEX= /^(?=(?:.*\d){6,})[0-9+().\-\/\sx]+$/i;
     MatFormFieldModule, MatInputModule, MatSelectModule,
     MatCheckboxModule, MatButtonModule,
     MatDatepickerModule, MatNativeDateModule, MatDividerModule,
-    MatIconModule, MatProgressSpinnerModule, MatAutocompleteModule
+    MatIconModule, MatProgressSpinnerModule, MatAutocompleteModule,
+    SubmissionHistoryComponent
   ],
   templateUrl: './registration-form.component.html',
   styleUrls: ['./registration-form.component.scss'],
@@ -95,6 +98,7 @@ export class RegistrationFormComponent implements OnInit {
   private geo = inject(GeoAdminService);
   private http = inject(HttpClient);
   private urbanLevelByCity = new Map<string, number>();
+  private history = inject(HistoryService);
 
   result: { ok: boolean; percentile?: number; probTrue?: number; probFalse?: number  } | null = null;
   loading = false;
@@ -301,8 +305,20 @@ export class RegistrationFormComponent implements OnInit {
     this.api.predict(payload).subscribe({
       next: r => {
         this.loading = false;
-        console.warn('Prediction result:', r);
         this.result = { ok: r.isBikeBuyer, percentile: r.percentile, probTrue: r.probTrue, probFalse: r.probFalse };
+        const v = this.form.getRawValue();
+
+        const pct = (r.percentile != null)
+          ? r.percentile
+          : (r.probTrue != null ? Math.round(r.probTrue * 100) : null);
+
+        this.history.add({
+          firstName: v.firstName ?? '',
+          lastName:  v.lastName ?? '',
+          email:     v.emailAddress ?? '',
+          isBuyer:   r.isBikeBuyer,
+          percentile: pct
+        });
       },
       error: () => {
         this.loading = false;

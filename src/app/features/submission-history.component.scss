@@ -1,0 +1,27 @@
+.history { margin-top: 16px; }
+.history h2 {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 1.05rem; font-weight: 600; margin: 18px 0 8px;
+}
+.empty { padding: 12px 0; color: #6b7280; }
+
+.history-table { display: grid; gap: 8px; margin-top: 8px; }
+.head, .row {
+  display: grid;
+  grid-template-columns: 1.2fr 1.2fr 2fr 1fr 1fr 40px;
+  align-items: center; gap: 8px;
+}
+.head { font-weight: 600; color: #374151; }
+.email { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.actions { display: flex; justify-content: flex-end; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 8px; border-radius: 999px; background: #f4f6f8; font-size: .85rem;
+}
+.chip.ok { background: #eaf7ef; color: #17663a; }
+.chip.ko { background: #fdecec; color: #a22626; }
+
+@media (max-width: 800px) {
+  .head, .row { grid-template-columns: 1fr 1fr 2fr .9fr 1fr 40px; }
+}
