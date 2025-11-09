@@ -1,27 +1,31 @@
-Voici une version claire et simple du **README** pour ton projet, qui explique à la fois la partie **technique Angular** et la **logique métier** du formulaire de prédiction BikeBuyer 👇
+# HES-SO MScBA MSI - Projet EAD Zalaxus : Partie 4 Webapp 
 
----
+## Objectif du projet
 
-# 🚴‍♂️ BikeBuyer Prediction Form
 
-## 🎯 Objectif du projet
+Cette webapp Angular permet d’obtenir une **prédiction d’achat de vélo** à partir des données client saisies.
 
-Cette application Angular permet de **simuler la prédiction d’un achat de vélo** à partir des données clients du jeu de données *Customer* (projet Dataiku).
+L’application envoie ces informations à une **API** qui interroge directement le **modèle de machine learning hébergé sur Dataiku**.
+Ce modèle, de type **Random Forest**, a été entraîné sur un jeu de données d’environ **9 000 enregistrements clients** issus du dataset *Customer*.
 
-Le but est de **collecter toutes les variables du client** (âge, genre, revenu, état civil, enfants, etc.) et d’envoyer les informations pertinentes à une **API Dataiku**, qui renvoie une prédiction :
+L’objectif est de **simuler la probabilité qu’un client achète un vélo** à partir de ses caractéristiques personnelles et socio-économiques.
 
-* `BikeBuyer = Oui / Non`
-* `Percentile` (niveau de probabilité ou classement du client)
+La webapp :
 
-Chaque simulation est aussi enregistrée localement dans le navigateur pour visualiser un **historique des prédictions** (sans base de données externe).
+* permet la saisie des variables du client (âge, genre, revenu, état civil, enfants, etc.) ;
+* envoie les informations pertinentes à la prédiction à l’**API Dataiku** ;
+* affiche la prédiction avec les infos suivantes :
 
----
+  * `BikeBuyer = Oui / Non`
+  * `Pourcentage` 
+  * `AUC Score` 
+* conserve chaque simulation localement pour un **historique des prédictions**.
 
-## ⚙️ Fonctionnement métier
+## Fonctionnement métier
 
 ### 1. Saisie utilisateur
 
-L’utilisateur remplit les **données issues du dataset Customer**, notamment :
+L’utilisateur remplit les **données** du formulair, notamment :
 
 * Informations personnelles : *Langue, Titre, Prénom, Nom, Genre, Date de naissance, Taille*
 * Statut familial : *État civil, Enfants, Enfants à la maison*
@@ -30,7 +34,7 @@ L’utilisateur remplit les **données issues du dataset Customer**, notamment :
 * Niveau d’éducation et profession
 * Informations économiques : *Propriétaire logement, Revenu annuel, Nombre de voitures*
 
-> 💡 Tous les champs du dataset `Customer` sont affichés dans le formulaire pour garder une cohérence complète avec la base Dataiku.
+> Tous les champs du dataset `Customer` sont affichés dans le formulaire pour garder une cohérence avec le dataset d'origine.
 
 ---
 
@@ -60,12 +64,12 @@ L’API renvoie un objet JSON contenant :
 
 * `prediction`: `true` ou `false`
 * `probaPercentile`: le pourcentage de probabilité d’achat
-* `probas`: les probabilités détaillées pour chaque classe (`true` / `false`)
+* `probas AUC`: les probabilités détaillées pour chaque classe (`true` / `false`)
 
 Ces valeurs sont affichées sous forme de badges dans l’interface :
 
-* ✅ **BikeBuyer: Oui / Non**
-* 📊 **Pourcentage ou probabilité**
+* **BikeBuyer: Oui / Non**
+* **Pourcentage ou probabilité**
 
 ---
 
@@ -79,14 +83,14 @@ Chaque simulation est sauvegardée dans le navigateur (via **localStorage**) :
 * Résultat de la prédiction (`Oui / Non`)
 * Pourcentage (`Percentile`)
 
-Une section “📜 Historique local” s’affiche sous le formulaire :
+Une section “Historique local” s’affiche sous le formulaire :
 
-* Chaque ligne peut être supprimée avec la 🗑️
+* Chaque ligne peut être supprimée avec le bouton corbeille
 * Le bouton “Vider l’historique” efface toutes les prédictions
 
 ---
 
-## 🧩 Structure du projet
+## Structure du projet
 
 | Dossier / Fichier                       | Description                                  |
 | --------------------------------------- | -------------------------------------------- |
@@ -99,7 +103,7 @@ Une section “📜 Historique local” s’affiche sous le formulaire :
 
 ---
 
-## 🚀 Démarrage
+## Lancement de la webapp
 
 ### 1. Installer les dépendances
 
@@ -123,17 +127,16 @@ ng serve
 
 ---
 
-## 🧠 Notes techniques
+## Notes techniques
 
 * **Angular 20 + Angular Material** pour l’UI
-* **Transloco** pour la traduction multilingue (FR, EN, DE, IT)
 * **LocalStorage** pour persister l’historique
 * **GeoAdmin API** pour autocompléter les villes suisses
 * **CSV loader** (`Town_Typlogy.csv`) pour mapper les communes à leur `UrbanLevel`
 
 ---
 
-## 📁 Exemple de réponse API Dataiku
+## Exemple de réponse API Dataiku
 
 ```json
 {
@@ -149,8 +152,5 @@ ng serve
 ```
 
 ---
+Projet pédagogique développé dans le cadre du module Exploration avancée des données et intelligence décisionnelle du Master MScBA en Management des Systèmes d’Information de la HES-SO.
 
-## 📄 Licence
-
-Projet pédagogique développé dans le cadre du module *Data Science / MLOps* —
-HES-SO Valais-Wallis — 2025.
