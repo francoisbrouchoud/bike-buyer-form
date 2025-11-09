@@ -15,11 +15,14 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Genre</mat-label>
-      <mat-select formControlName="gender">
-        <mat-option *ngFor="let g of genders" [value]="g.value">{{ g.key }}</mat-option>
+      <mat-label>Titre</mat-label>
+      <mat-select formControlName="title">
+        <mat-option *ngFor="let t of titleOptions" [value]="t.value">
+          {{ t.key }}
+        </mat-option>
       </mat-select>
     </mat-form-field>
+
 
     <mat-form-field appearance="outline">
       <mat-label>Prénom</mat-label>
@@ -45,6 +48,13 @@
       <input matInput type="number" formControlName="height">
       <mat-error *ngIf="form.get('height')?.errors?.['min']">Min 100 cm</mat-error>
       <mat-error *ngIf="form.get('height')?.errors?.['max']">Max 275 cm</mat-error>
+    </mat-form-field>
+
+     <mat-form-field appearance="outline">
+      <mat-label>Genre</mat-label>
+      <mat-select formControlName="gender">
+        <mat-option *ngFor="let g of genders" [value]="g.value">{{ g.key }}</mat-option>
+      </mat-select>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
@@ -163,11 +173,6 @@
     <mat-checkbox formControlName="homeOwner">Propriétaire de son logement</mat-checkbox>
 
     <mat-form-field appearance="outline">
-      <mat-label>Nombre de voitures</mat-label>
-      <input matInput type="number" formControlName="numberCarsOwned">
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
       <mat-label>Nombre total d’enfants</mat-label>
       <input matInput type="number" formControlName="totalChildren">
     </mat-form-field>
@@ -176,6 +181,12 @@
       <mat-label>Enfants à la maison</mat-label>
       <input matInput type="number" formControlName="totalChildrenAtHome">
     </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre de voitures</mat-label>
+      <input matInput type="number" formControlName="numberCarsOwned">
+    </mat-form-field>
+
 
     <!-- Éducation / Profession -->
     <div class="section col-2">
@@ -204,29 +215,33 @@
       </button>
     </div>
   </form>
-
   <div class="result" *ngIf="loading || result">
-  <div class="loading" *ngIf="loading">
-    <mat-progress-spinner mode="indeterminate" diameter="22"></mat-progress-spinner>
-    Prediction en cours...
-  </div>
-  <div *ngIf="!loading && result">
-    <span class="chip" [class.ok]="result.ok" [class.ko]="!result.ok">
-      <mat-icon>{{ result.ok ? 'check_circle' : 'cancel' }}</mat-icon>
-      {{ result.ok ? 'BikeBuyer: Yes' : 'BikeBuyer: No' }}
-    </span>
-
-    <div *ngIf="result.percentile != null">
-      <span class="chip">
-      <mat-icon>info</mat-icon> Pourcentage : {{ result.percentile }} % 
-      </span>
+    <div class="loading" *ngIf="loading">
+      <mat-progress-spinner mode="indeterminate" diameter="22"></mat-progress-spinner>
+      Prediction en cours...
     </div>
 
-    <div *ngIf="result.probTrue != null && result.probFalse != null">
-      <span class="chip">
-      <mat-icon>insights</mat-icon> 
-      p(true): {{ result.probTrue | number:'1.0-3' }} | p(false): {{ result.probFalse | number:'1.0-3' }}
+    <div *ngIf="!loading && result" class="chips">
+      <span class="chip" [class.ok]="result.ok" [class.ko]="!result.ok">
+        <mat-icon>{{ result.ok ? 'check_circle' : 'cancel' }}</mat-icon>
+        {{ result.ok ? 'BikeBuyer: Oui' : 'BikeBuyer: Non' }}
       </span>
+
+      <ng-container *ngIf="result.percentile != null">
+        <span class="chip">
+          <mat-icon>info</mat-icon>
+          Pourcentage : {{ result.percentile }} %
+        </span>
+      </ng-container>
+
+      <ng-container *ngIf="result.probTrue != null && result.probFalse != null">
+        <span class="chip">
+          <mat-icon>insights</mat-icon>
+          p(true): {{ result.probTrue | number:'1.0-3' }} |
+          p(false): {{ result.probFalse | number:'1.0-3' }}
+        </span>
+      </ng-container>
     </div>
   </div>
+  
 </div>

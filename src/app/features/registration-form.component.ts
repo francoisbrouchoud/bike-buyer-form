@@ -30,7 +30,7 @@ const EDUCATION_OPTIONS = [
 ] as const;
 
 const OCCUPATION_OPTIONS = [
-  { value: 'Professional'},
+  { value: 'Professional' },
   { value: 'Skilled Manual'},
   { value: 'Management'},
   { value: 'Clerical'},
@@ -44,6 +44,32 @@ const YEARLY_INCOME_OPTIONS = [
   { value: '90001-120000',   key: '90’001 – 120’000',    mid: 105000, level:4 },
   { value: 'greater than 120000', key: 'Plus de 120’000', mid: 120000, level:5 },
 ] as const;
+
+type TitleValue =
+  | 'Herr' | 'Frau'
+  | 'Mister' | 'Mrs'
+  | 'Monsieur' | 'Madame'
+  | 'Signore' | 'Signora';
+
+  const TITLES_BY_LANG: Record<LangCode, ReadonlyArray<{ value: TitleValue; key: string }>> = {
+  FR: [
+    { value: 'Monsieur', key: 'Monsieur' },
+    { value: 'Madame',   key: 'Madame' },
+  ],
+  EN: [
+    { value: 'Mister', key: 'Mister' },
+    { value: 'Mrs',    key: 'Mrs' },
+  ],
+  DE: [
+    { value: 'Herr', key: 'Herr' },
+    { value: 'Frau', key: 'Frau' },
+  ],
+  IT: [
+    { value: 'Signore', key: 'Signore' },
+    { value: 'Signora', key: 'Signora' },
+  ],
+} as const;
+
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const PHONE_REGEX= /^(?=(?:.*\d){6,})[0-9+().\-\/\sx]+$/i;
@@ -93,6 +119,7 @@ export class RegistrationFormComponent implements OnInit {
 
   form = this.fb.group({
     language: ['FR' as LangCode],
+    title: [TITLES_BY_LANG['FR'][0].value as TitleValue],
     firstName: [''],
     lastName:  [''],
     gender:    [''],
@@ -112,8 +139,8 @@ export class RegistrationFormComponent implements OnInit {
     numberCarsOwned: [0, [Validators.min(0)]],
     totalChildren: [0, [Validators.min(0)]],
     totalChildrenAtHome: [0, [Validators.min(0)]],
-    education: [EDUCATION_OPTIONS[2].value],
-    occupation: [OCCUPATION_OPTIONS[0].value],
+    education: [''],
+    occupation: [''],
   });
 
   get isCH(): boolean {
@@ -121,7 +148,7 @@ export class RegistrationFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-     this.loadTownTypology();
+    this.loadTownTypology();
 
     this.form.controls.birthDate.valueChanges.subscribe(d => {
       this.age = d ? this.computeAge(d) : null;
@@ -161,6 +188,25 @@ export class RegistrationFormComponent implements OnInit {
         this.addressOptions$ = of([]);
       }
     });
+
+    {
+      const initLang = (this.form.controls.language.value || 'FR') as LangCode;
+      const initOpts = TITLES_BY_LANG[initLang] ?? [];
+      this.form.controls.title.setValue(initOpts[0]?.value ?? '');
+    }
+
+    this.form.controls.language.valueChanges.subscribe((lang) => {
+      const l = (lang || 'FR') as LangCode;
+      const opts = TITLES_BY_LANG[l] ?? [];
+      const current = this.form.controls.title.value as TitleValue | '';
+
+    // si la valeur actuelle n'est pas disponible dans la nouvelle langue, on prend la 1ʳᵉ
+    if (!opts.some(o => o.value === current)) {
+      this.form.controls.title.setValue(opts[0]?.value ?? '');
+    }
+});
+
+
   }
 
   onCitySelected(opt: { zip: string; city: string; canton?: string }) {
@@ -178,6 +224,10 @@ export class RegistrationFormComponent implements OnInit {
     });
   }
 
+  get titleOptions() {
+    const lang = (this.form.controls.language.value || 'FR') as LangCode;
+    return TITLES_BY_LANG[lang] ?? [];
+  }
 
 
   private computeAge(d: Date): number {
@@ -234,7 +284,7 @@ export class RegistrationFormComponent implements OnInit {
 
     const v = this.form.getRawValue();
     const urbanLevel = this.lookupUrbanLevel(v.city);
-    console.warn('Urban level for city', v.city, 'is', urbanLevel);
+  
     const payload: BikeBuyerPayload = {
       features: {
         Occupation: v.occupation,
@@ -251,6 +301,7 @@ export class RegistrationFormComponent implements OnInit {
     this.api.predict(payload).subscribe({
       next: r => {
         this.loading = false;
+        console.warn('Prediction result:', r);
         this.result = { ok: r.isBikeBuyer, percentile: r.percentile, probTrue: r.probTrue, probFalse: r.probFalse };
       },
       error: () => {

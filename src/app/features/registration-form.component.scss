@@ -35,3 +35,23 @@ h2 {
 @media (max-width: 800px) {
   .grid { grid-template-columns: 1fr; }
 }
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px; // ← espace entre les “boutons”
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f4f6f8;
+  font-size: .9rem;
+}
+
+.chip.ok { background: #eaf7ef; color: #17663a; }
+.chip.ko { background: #fdecec; color: #a22626; }
