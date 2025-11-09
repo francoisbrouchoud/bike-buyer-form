@@ -58,9 +58,9 @@ export class RegistrationFormComponent implements OnInit {
   age: number | null = null;
 
   languageOptions: LangCode[] = ['FR','EN','DE','IT'];
-  countries = [{value:'CH' as Country, key:'CH'},{value:'DE' as Country, key:'DE'},{value:'GB' as Country, key:'GB'}];
-  genders = [{value:'M', key:'male'},{value:'F', key:'female'}];
-  maritals = [{value:'M', key:'married'},{value:'S', key:'single'}];
+  countries = [{value:'CH' as Country, key:'Suisse'},{value:'DE' as Country, key:'Allemagne'},{value:'GB' as Country, key:'Royaume-Uni'}];
+  genders = [{value:'M', key:'Homme'},{value:'F', key:'Femme'}];
+  maritals = [{value:'M', key:'Marié'},{value:'S', key:'Célibataire'}];
   yesNo = [{value:1, key:'yes'},{value:0, key:'no'}];
 
   educationOptions = [...EDUCATION_OPTIONS];
@@ -73,10 +73,10 @@ export class RegistrationFormComponent implements OnInit {
     language: ['FR' as LangCode],
     firstName: [''],
     lastName:  [''],
-    gender:    ['M'],
+    gender:    [''],
     birthDate: [null as Date | null],
     height:    [null as number | null],
-    maritalStatus: ['S'],
+    maritalStatus: [''],
     emailAddress: [''],
     phoneNumber: [''],
     emailPromotion: [0],
