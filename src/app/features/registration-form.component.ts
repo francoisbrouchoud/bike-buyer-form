@@ -6,7 +6,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,7 +13,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService, BikeBuyerPayload } from '../services/api.service';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { GeoAdminService } from '../services/geoadmin.service';
-import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { Observable, of, debounceTime, distinctUntilChanged, filter, map, startWith, switchMap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { SubmissionHistoryComponent } from './submission-history.component';
@@ -80,12 +78,10 @@ const PHONE_REGEX= /^(?=(?:.*\d){6,})[0-9+().\-\/\sx]+$/i;
 @Component({
   selector: 'app-registration-form',
   standalone: true,
-  providers: [{ provide: MAT_DATE_LOCALE, useValue: 'fr-CH' }],
   imports: [
     CommonModule, ReactiveFormsModule,
     MatFormFieldModule, MatInputModule, MatSelectModule,
-    MatCheckboxModule, MatButtonModule,
-    MatDatepickerModule, MatNativeDateModule, MatDividerModule,
+    MatCheckboxModule, MatButtonModule, MatNativeDateModule, MatDividerModule,
     MatIconModule, MatProgressSpinnerModule, MatAutocompleteModule,
     SubmissionHistoryComponent
   ],
@@ -127,7 +123,7 @@ export class RegistrationFormComponent implements OnInit {
     firstName: [''],
     lastName:  [''],
     gender:    [''],
-    birthDate: [null as Date | null],
+    birthDate: [''],
     height:    [null, [Validators.min(100), Validators.max(275)]],
     maritalStatus: [''],
     emailAddress: ['', [Validators.pattern(EMAIL_REGEX)]],
@@ -154,9 +150,10 @@ export class RegistrationFormComponent implements OnInit {
   ngOnInit(): void {
     this.loadTownTypology();
 
-    this.form.controls.birthDate.valueChanges.subscribe(d => {
-      this.age = d ? this.computeAge(d) : null;
-    });
+    this.form.controls.birthDate.valueChanges.subscribe(v => {
+      this.age = this.computeAgeFromText(v);
+  });
+
 
     // Autocomplete
     const country$ = this.form.controls.country.valueChanges.pipe(startWith(this.form.controls.country.value));
@@ -204,13 +201,10 @@ export class RegistrationFormComponent implements OnInit {
       const opts = TITLES_BY_LANG[l] ?? [];
       const current = this.form.controls.title.value as TitleValue | '';
 
-    // si la valeur actuelle n'est pas disponible dans la nouvelle langue, on prend la 1ʳᵉ
     if (!opts.some(o => o.value === current)) {
       this.form.controls.title.setValue(opts[0]?.value ?? '');
     }
 });
-
-
   }
 
   onCitySelected(opt: { zip: string; city: string; canton?: string }) {
@@ -231,6 +225,19 @@ export class RegistrationFormComponent implements OnInit {
   get titleOptions() {
     const lang = (this.form.controls.language.value || 'FR') as LangCode;
     return TITLES_BY_LANG[lang] ?? [];
+    
+  }
+
+  private computeAgeFromText(dateStr: unknown): number | null {
+    const s = (dateStr ?? '').toString().trim();
+    const m = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.exec(s);
+    if (!m) return null;
+    const [_, dd, mm, yyyy] = m;
+    const d = Number(dd), mth = Number(mm), y = Number(yyyy);
+    if (d < 1 || d > 31 || mth < 1 || mth > 12 || y < 1900) return null;
+    const js = new Date(y, mth - 1, d);
+    if (isNaN(js.getTime())) return null;
+    return this.computeAge(js);
   }
 
 
@@ -298,7 +305,8 @@ export class RegistrationFormComponent implements OnInit {
         Gender: v.gender,
         EducationLevel: v.education,
         UrbanLevel: urbanLevel ?? undefined,
-        Age: this.age,
+        Age: this.age ?? undefined,
+
       }
     };
 
