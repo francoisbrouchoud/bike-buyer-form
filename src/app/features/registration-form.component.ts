@@ -16,6 +16,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { GeoAdminService } from '../services/geoadmin.service';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { Observable, of, debounceTime, distinctUntilChanged, filter, map, startWith, switchMap } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 type Country = 'CH' | 'DE' | 'GB';
 type LangCode = 'EN'|'FR'|'DE'|'IT';
@@ -66,6 +67,8 @@ export class RegistrationFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private api = inject(ApiService);
   private geo = inject(GeoAdminService);
+  private http = inject(HttpClient);
+  private urbanLevelByCity = new Map<string, number>();
 
   result: { ok: boolean; percentile?: number; probTrue?: number; probFalse?: number  } | null = null;
   loading = false;
@@ -118,6 +121,8 @@ export class RegistrationFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+     this.loadTownTypology();
+
     this.form.controls.birthDate.valueChanges.subscribe(d => {
       this.age = d ? this.computeAge(d) : null;
     });
@@ -183,36 +188,63 @@ export class RegistrationFormComponent implements OnInit {
     return age;
   }
 
+  private loadTownTypology(): void {
+    this.http.get('assets/Towns_Typology.csv', { responseType: 'text' })
+      .subscribe({
+        next: (csv: string) => this.parseTownTypology(csv),
+        error: () => {
+          this.urbanLevelByCity.clear();
+        }
+      });
+  }
+
+  private parseTownTypology(csvText: string): void {
+    this.urbanLevelByCity.clear();
+    if (!csvText) return;
+
+    const lines = csvText.replace(/\r/g, '').split('\n').map(l => l.trim()).filter(Boolean);
+    const startIdx = lines[0]?.toLowerCase().startsWith('commune,urbanlevel') ? 1 : 0;
+
+    for (let i = startIdx; i < lines.length; i++) {
+      const [commune, levelStr] = lines[i].split(',').map(s => (s ?? '').trim());
+      if (!commune) continue;
+      const level = Number(levelStr);
+      if (!Number.isFinite(level)) continue;
+      this.urbanLevelByCity.set(this.normalizeCity(commune), level);
+    }
+  }
+
+  private normalizeCity(s: string | null | undefined): string {
+    return (s ?? '')
+      .toString()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+      .toLowerCase();
+  }
+
+  private lookupUrbanLevel(city: string | null | undefined): number | undefined {
+    const key = this.normalizeCity(city);
+    return this.urbanLevelByCity.get(key);
+  }
+
   submit() {
     this.result = null;
     this.loading = true;
 
     const v = this.form.getRawValue();
+    const urbanLevel = this.lookupUrbanLevel(v.city);
+    console.warn('Urban level for city', v.city, 'is', urbanLevel);
     const payload: BikeBuyerPayload = {
       features: {
-        Language: v.language,
-        FirstName: v.firstName,
-        LastName: v.lastName,
-        Country: v.country,
-        Zip: v.zip,
-        City: v.city,
-        Street: v.street,
-        State: v.state,
-        PhoneNumber: v.phoneNumber,
-        EmailAddress: v.emailAddress,
-        EmailPromotion: Number(v.emailPromotion),
-        Gender: v.gender,
-        BirthDate: v.birthDate ? new Date(v.birthDate).toISOString().slice(0, 10) : null,
-        Age: this.age,
-        Height: v.height != null ? Number(v.height) : null,
-        MaritalStatus: v.maritalStatus,
-        YearlyIncome: v.yearlyIncome,
-        TotalChildren: Number(v.totalChildren),
-        TotalChildrenAtHome: Number(v.totalChildrenAtHome),
-        Education: v.education,
         Occupation: v.occupation,
-        HomeOwner: !!v.homeOwner,
-        NumberCarsOwned: Number(v.numberCarsOwned),
+        DivorcedFlag: (Number(v.totalChildren) > 0 && v.maritalStatus === 'S') ? 1 : 0,
+        Country: v.country,
+        City: v.city,
+        Gender: v.gender,
+        EducationLevel: v.education,
+        UrbanLevel: urbanLevel ?? undefined,
+        Age: this.age,
       }
     };
 
