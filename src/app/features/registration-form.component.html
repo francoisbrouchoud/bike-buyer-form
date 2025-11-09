@@ -62,12 +62,18 @@
 
     <mat-form-field appearance="outline" class="col-2">
       <mat-label>Adresse e-mail</mat-label>
-      <input matInput formControlName="emailAddress">
+      <input matInput type="email" formControlName="emailAddress" autocomplete="email">
+      <mat-error *ngIf="form.controls.emailAddress.hasError('pattern')">
+        Adresse e‑mail invalide
+      </mat-error>
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="outline" class="col-2">
       <mat-label>Téléphone</mat-label>
-      <input matInput formControlName="phoneNumber">
+      <input matInput type="tel" formControlName="phoneNumber" autocomplete="tel">
+      <mat-error *ngIf="form.controls.phoneNumber.hasError('pattern')">
+        Numéro de téléphone invalide
+      </mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
@@ -154,7 +160,7 @@
       </mat-select>
     </mat-form-field>
 
-    <mat-checkbox formControlName="homeOwner">Propriétaire</mat-checkbox>
+    <mat-checkbox formControlName="homeOwner">Propriétaire de son logement</mat-checkbox>
 
     <mat-form-field appearance="outline">
       <mat-label>Nombre de voitures</mat-label>

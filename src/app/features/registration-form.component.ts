@@ -44,6 +44,9 @@ const YEARLY_INCOME_OPTIONS = [
   { value: 'greater than 120000', key: 'Plus de 120’000', mid: 120000, level:5 },
 ] as const;
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const PHONE_REGEX= /^(?=(?:.*\d){6,})[0-9+().\-\/\sx]+$/i;
+
 
 @Component({
   selector: 'app-registration-form',
@@ -93,8 +96,8 @@ export class RegistrationFormComponent implements OnInit {
     birthDate: [null as Date | null],
     height:    [null, [Validators.min(100), Validators.max(275)]],
     maritalStatus: [''],
-    emailAddress: [''],
-    phoneNumber: [''],
+    emailAddress: ['', [Validators.pattern(EMAIL_REGEX)]],
+    phoneNumber: ['', [Validators.pattern(PHONE_REGEX)]],
     emailPromotion: [0],
     country: ['CH' as Country],
     zip:     [''],
