@@ -36,7 +36,6 @@ Seules les variables pertinentes pour la prédiction sont envoyées au modèle :
 | ---------------- | ---------------------- | --------------------------------------- |
 | `Occupation`     | Profession             | Type d’emploi                           |
 | `DivorcedFlag`   | Calcul automatique     | 1 si Célibataire + Enfants > 0, sinon 0 |
-| `Country`        | Pays                   | Code pays                               |
 | `City`           | Localité               | Ville saisie                            |
 | `Gender`         | Genre                  | M/F                                     |
 | `EducationLevel` | Niveau d’éducation     | Échelle 1 – 5                           |
@@ -66,9 +65,9 @@ L’API retourne un objet JSON du type :
 
 Ces valeurs sont affichées dans l’interface sous forme de badges :
 
-* **BikeBuyer** : Oui / Non
-* **Pourcentage de probabilité**
-* **Score AUC**
+* **BikeBuyer** : Acheteur de vélo avec comme réponse **Oui / Non**.
+* **ProbaPercentile** : Plus susceptible d’acheter d’environ **[valeur en pourcent]** que le reste des clients.
+* **ProbaTrue** : Environ **[valeur en pourcent]** de chances d’acheter un vélo.
 
 ---
 
@@ -91,12 +90,17 @@ Chaque simulation est conservée dans le **localStorage** du navigateur :
 
 ---
 
-## Technologies utilisées
+## Technologies utilisées pour la webapp
 
-* **Angular 20** + **Angular Material** (UI)
-* **GeoAdmin API** (suggestion de localité suisse)
-* **CSV Loader** (mapping UrbanLevel)
-* **LocalStorage** (persistance de l’historique)
+- **Angular 20** (`@angular/core`, `@angular/common`, `@angular/forms`, `@angular/router`)
+- **Angular Material & CDK** (`@angular/material`, `@angular/cdk`)  
+  UI du formulaire (inputs, selects, datepicker, boutons, icônes, layout).
+- **RxJS (~7.8)** pour la gestion des flux réactifs (autocomplete GeoAdmin, écoute des champs).
+- **HttpClient Angular** pour appeler :
+  - l’API Dataiku (prédiction BikeBuyer),
+  - l’API GeoAdmin (localités/adresses),
+  - le fichier CSV `assets/Towns_Typology.csv`.
+- **localStorage (API Web native)** pour persister l’historique des prédictions côté navigateur.
 
 ---
 
