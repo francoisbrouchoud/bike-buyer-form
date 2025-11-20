@@ -239,15 +239,14 @@
       <ng-container *ngIf="result.percentile != null">
         <span class="chip">
           <mat-icon>info</mat-icon>
-          Pourcentage : {{ result.percentile }} %
+Plus susceptible d’acheter qu’environ {{ result.percentile }} % des clients
         </span>
       </ng-container>
 
       <ng-container *ngIf="result.probTrue != null && result.probFalse != null">
         <span class="chip">
           <mat-icon>insights</mat-icon>
-          p(true): {{ result.probTrue | number:'1.0-3' }} |
-          p(false): {{ result.probFalse | number:'1.0-3' }}
+Environ {{ (result.probTrue * 100) | number:'1.0-0' }} % de chances d’acheter un vélo
         </span>
       </ng-container>
     </div>

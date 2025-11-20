@@ -322,9 +322,7 @@ export class RegistrationFormComponent implements OnInit {
         this.result = { ok: r.isBikeBuyer, percentile: r.percentile, probTrue: r.probTrue, probFalse: r.probFalse };
         const v = this.form.getRawValue();
 
-        const pct = (r.percentile != null)
-          ? r.percentile
-          : (r.probTrue != null ? Math.round(r.probTrue * 100) : null);
+        const pct = (r.probTrue != null) ? Math.round(r.probTrue * 100): null;
 
         this.history.add({
           firstName: v.firstName ?? '',
