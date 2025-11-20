@@ -17,6 +17,7 @@ import { Observable, of, debounceTime, distinctUntilChanged, filter, map, startW
 import { HttpClient } from '@angular/common/http';
 import { SubmissionHistoryComponent } from './submission-history.component';
 import { HistoryService } from '../services/history.service';
+import { RandomCustomerService } from '../services/random-customer.service';
 
 type Country = 'CH' | 'DE' | 'GB';
 type LangCode = 'EN'|'FR'|'DE'|'IT';
@@ -95,6 +96,7 @@ export class RegistrationFormComponent implements OnInit {
   private http = inject(HttpClient);
   private urbanLevelByCity = new Map<string, number>();
   private history = inject(HistoryService);
+  private randomCustomer = inject(RandomCustomerService);
 
   result: { ok: boolean; percentile?: number; probTrue?: number; probFalse?: number  } | null = null;
   loading = false;
@@ -288,6 +290,12 @@ export class RegistrationFormComponent implements OnInit {
     const key = this.normalizeCity(city);
     return this.urbanLevelByCity.get(key);
   }
+
+    fillRandom() {
+    const data = this.randomCustomer.generate();
+    this.form.patchValue(data);
+  }
+
 
   submit() {
     this.result = null;

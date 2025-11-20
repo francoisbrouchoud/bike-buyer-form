@@ -209,11 +209,20 @@
     </mat-form-field>
 
     <div class="actions col-2">
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="fillRandom()"
+        [disabled]="loading">
+        <mat-icon>auto_fix_high</mat-icon>
+        Générer un client fictif
+      </button>
+
       <button mat-flat-button color="primary" type="submit" [disabled]="loading">
         <mat-icon>pedal_bike</mat-icon>
         Prédire l’achat de vélo
       </button>
-    </div>
+  </div>
   </form>
   <div class="result" *ngIf="loading || result">
     <div class="loading" *ngIf="loading">
