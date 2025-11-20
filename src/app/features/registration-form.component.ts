@@ -300,13 +300,11 @@ export class RegistrationFormComponent implements OnInit {
       features: {
         Occupation: v.occupation,
         DivorcedFlag: (Number(v.totalChildren) > 0 && v.maritalStatus === 'S') ? 1 : 0,
-        Country: v.country,
         City: v.city,
         Gender: v.gender,
         EducationLevel: v.education,
         UrbanLevel: urbanLevel ?? undefined,
         Age: this.age ?? undefined,
-
       }
     };
 
